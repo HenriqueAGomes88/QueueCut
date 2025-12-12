@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QueueCut - Uber das Filas</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div id="sidebar-overlay" onclick="App.toggleSidebar(false)"></div>
+        <aside id="app-sidebar">
+            <div class="sidebar-header" onclick="App.navigateTo('view-profile')">
+                <div class="user-brief">
+                    <img src="https://i.pravatar.cc/100?img=33" alt="User">
+                    <div>
+                        <h3>Henrique Gomes</h3>
+                        <span id="user-role-label">Modo Cliente</span>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-item" onclick="App.navigateTo('view-wallet')"><i class="fas fa-wallet"></i> Carteira</div>
+                <div class="menu-item" onclick="App.navigateTo('view-history')"><i class="fas fa-history"></i> Histórico</div>
+                <div class="menu-item" onclick="App.navigateTo('view-promos')"><i class="fas fa-gift"></i> Promoções</div>
+                <div class="divider"></div>
+                <div class="menu-item" onclick="App.navigateTo('view-settings')"><i class="fas fa-cog"></i> Definições</div>
+                <div class="menu-item" onclick="App.navigateTo('view-help')"><i class="fas fa-question-circle"></i> Ajuda</div>
+                <div class="divider"></div>
+                <div class="menu-item" onclick="App.switchMode()"><i class="fas fa-exchange-alt"></i> <span id="switch-mode-text">Mudar para Waiter</span></div>
+                <div class="menu-item logout" onclick="App.logout()"><i class="fas fa-sign-out-alt"></i> Sair</div>
+            </nav>
+        </aside>
+
+        <section id="view-login" class="view active">
+            <div class="login-content">
+                <div class="logo-wrapper">
+                    <img src="assets/logo.png" alt="QueueCut" class="app-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                    <h1 style="display:none; color:white; font-size: 40px;"><i class="fas fa-users-line"></i></h1> 
+                    <h1>QueueCut</h1><p>O teu tempo é valioso.</p>
+                </div>
+                <div class="login-actions">
+                    <button class="btn btn-primary" onclick="App.login('client')">Entrar como Cliente</button>
+                    <button class="btn btn-outline" onclick="App.login('waiter')">Sou um Waiter</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-map" class="view">
+            <div class="floating-ui top-left"><button class="circle-btn" onclick="App.toggleSidebar(true)"><i class="fas fa-bars"></i></button></div>
+            <div class="floating-ui top-right"><div class="profile-chip" onclick="App.navigateTo('view-profile')"><span>5.0 ★</span><img src="https://i.pravatar.cc/100?img=33" style="width: 32px; border-radius: 50%;"></div></div>
+            
+            <div id="map-container"></div>
+            
+            <div class="bottom-sheet" id="bottom-sheet-client">
+                <div id="panel-search" class="panel-state active">
+                    <div class="drag-handle"></div><h2>Para onde queres ir?</h2>
+                    <div class="search-input" onclick="App.openRequest('Mosteiro dos Jerónimos')"><i class="fas fa-search"></i><input type="text" placeholder="Procurar local..." disabled></div>
+                    <div class="suggestions"><div class="chip" onclick="App.openRequest('Mosteiro Jerónimos')">🏛️ Jerónimos</div><div class="chip" onclick="App.openRequest('Loja Cidadão')">🎫 Loja Cidadão</div></div>
+                </div>
+                <div id="panel-request" class="panel-state">
+                    <div class="drag-handle" onclick="App.resetPanel()"></div>
+                    <div class="location-header"><h2 id="selected-location-name">Local</h2><span class="badge-time">~2h espera</span></div>
+                    <div class="service-option selected"><div class="icon-box"><i class="fas fa-stopwatch" style="color: var(--primary-orange)"></i></div><div class="service-details"><span class="service-name">Lugar na Fila</span><span class="service-desc">Waiter chega em 5 min</span></div><div class="service-price">12.50€</div></div>
+                    <button class="btn btn-action" onclick="App.startMatching()">Confirmar Waiter</button>
+                </div>
+                <div id="panel-matching" class="panel-state"><div class="loader-container"><div class="pulse-ring"></div><i class="fas fa-user avatar-searching"></i></div><h3>A contactar Waiters...</h3></div>
+                <div id="panel-found" class="panel-state">
+                    <div class="success-header"><i class="fas fa-check-circle"></i> Pedido Aceite!</div>
+                    <div class="waiter-card"><div style="width: 50px; height: 50px; background: #ddd; border-radius: 50%; overflow: hidden; margin-right: 12px;"><img src="https://i.pravatar.cc/150?u=waiter" width="50"></div><div class="waiter-info"><h3>João Dinis</h3><p>★ 4.9 • PG61142</p></div></div>
+                    <button class="btn btn-outline" onclick="App.resetPanel()">Cancelar</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-waiter-home" class="view">
+            <div class="waiter-top-bar">
+                <button class="circle-btn" onclick="App.toggleSidebar(true)"><i class="fas fa-bars"></i></button>
+                <div class="earnings-pill">124.50€</div>
+                <div class="profile-chip waiter-chip"><span>4.9 ★</span><img src="https://i.pravatar.cc/100?img=12"></div>
+            </div>
+
+            <div id="map-container-waiter" style="flex-grow: 1; background: #e5e3df;"></div>
+
+            <div id="go-online-btn" class="go-online-wrapper" onclick="WaiterApp.toggleOnline()">
+                <div class="go-button">GO</div>
+                <div class="go-status">OFFLINE</div>
+            </div>
+
+            <div class="bottom-sheet" id="bottom-sheet-waiter">
+                <div id="panel-job-offer" class="panel-state">
+                    <div class="job-offer-header"><div class="time-dist">5 min • 2.1 km</div><div class="job-price">12.50€</div></div>
+                    <h2 class="job-title">Mosteiro dos Jerónimos</h2>
+                    <p class="job-desc">Fila estimada: 1h 45min</p>
+                    <div class="job-actions">
+                        <button class="btn btn-outline reject" onclick="WaiterApp.rejectJob()">Recusar</button>
+                        <button class="btn btn-primary accept" onclick="WaiterApp.acceptJob()">Aceitar</button>
+                    </div>
+                </div>
+                <div id="panel-job-active" class="panel-state">
+                    <div class="drag-handle"></div>
+                    <div class="active-job-info">
+                        <h3>Cliente: Maria</h3>
+                        <div class="steps-progress">
+                            <div class="step-dot active"></div><div class="step-line"></div>
+                            <div class="step-dot"></div><div class="step-line"></div>
+                            <div class="step-dot"></div>
+                        </div>
+                    </div>
+                    <div id="job-status-text" class="status-big">A caminho do local</div>
+                    <button id="job-action-btn" class="btn btn-action" onclick="WaiterApp.nextStep()">Cheguei ao Local</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-profile" class="view page-bg">
+            <div class="page-header"><button class="circle-btn" onclick="App.navigateTo('view-map')"><i class="fas fa-arrow-left"></i></button><h2>Perfil</h2><div style="width: 45px;"></div></div>
+            <div class="scroll-content">
+                <div class="profile-avatar-large"><img src="https://i.pravatar.cc/100?img=33"><div class="edit-badge" onclick="App.editProfile()"><i class="fas fa-pen"></i></div></div>
+                <h2 class="center-text mt-15">Henrique Gomes</h2><p class="center-text text-grey">PG60101</p>
+                <div class="list-group mt-15">
+                    <div class="list-item" onclick="App.editProfile()"><i class="fas fa-user-edit icon"></i><div class="text">Editar Dados Pessoais</div></div>
+                    <div class="list-item" onclick="App.changePassword()"><i class="fas fa-lock icon"></i><div class="text">Alterar Password</div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-wallet" class="view page-bg">
+            <div class="page-header"><button class="circle-btn" onclick="App.navigateTo('view-map')"><i class="fas fa-arrow-left"></i></button><h2>Pagamentos</h2><div style="width: 45px;"></div></div>
+            <div class="scroll-content">
+                <div class="credit-card"><div class="card-number">**** **** **** 4242</div><div class="card-name">HENRIQUE GOMES</div><div class="card-logo"><i class="fab fa-cc-visa"></i></div></div>
+                <h3 class="section-label">Métodos</h3>
+                <div class="list-group">
+                    <div class="list-item"><i class="fab fa-apple icon"></i><div class="text">Apple Pay</div><i class="fas fa-check text-green"></i></div>
+                    <div class="list-item action-text" onclick="App.openModal('modal-payment')"><i class="fas fa-plus icon-blue"></i> Adicionar novo método</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-history" class="view page-bg">
+            <div class="page-header"><button class="circle-btn" onclick="App.navigateTo('view-map')"><i class="fas fa-arrow-left"></i></button><h2>Minhas Filas</h2><div style="width: 45px;"></div></div>
+            <div class="scroll-content">
+                <div class="history-card">
+                    <div class="h-header"><span>04 Dez</span><span>12.50€</span></div>
+                    <div class="h-body"><h3>Mosteiro dos Jerónimos</h3><p>Waiter: João Dinis</p></div>
+                    <div class="h-footer"><span class="status-badge success">Concluído</span><button class="btn-text" onclick="App.openModal('modal-receipt')">Ver Recibo</button></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-promos" class="view page-bg">
+            <div class="page-header"><button class="circle-btn" onclick="App.navigateTo('view-map')"><i class="fas fa-arrow-left"></i></button><h2>Promoções</h2><div style="width: 45px;"></div></div>
+            <div class="scroll-content">
+                <div class="promo-input-container"><input type="text" id="promo-input" placeholder="Ex: QUEUECUT20"><button onclick="App.addPromo()">Adicionar</button></div>
+                <div id="promo-list">
+                    <div class="promo-ticket"><div class="ticket-left"><span class="discount">5€ OFF</span><span class="desc">Primeira fila</span></div><div class="ticket-right"><span>USAR</span></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-settings" class="view page-bg">
+            <div class="page-header"><button class="circle-btn" onclick="App.navigateTo('view-map')"><i class="fas fa-arrow-left"></i></button><h2>Definições</h2><div style="width: 45px;"></div></div>
+            <div class="scroll-content">
+                <h3 class="section-label">Preferências</h3>
+                <div class="list-group">
+                    <div class="list-item toggle-item">
+                        <div class="text">Modo Escuro</div>
+                        <label class="switch"><input type="checkbox" onchange="App.toggleDarkMode(this)"><span class="slider round"></span></label>
+                    </div>
+                    <div class="list-item toggle-item"><div class="text">Notificações</div><label class="switch"><input type="checkbox" checked><span class="slider round"></span></label></div>
+                </div>
+                <h3 class="section-label">Conta</h3>
+                <div class="list-group">
+                    <div class="list-item" onclick="App.editProfile()"><div class="text">Editar Perfil</div><i class="fas fa-chevron-right text-grey"></i></div>
+                    <div class="list-item" onclick="App.changePassword()"><div class="text">Alterar Password</div><i class="fas fa-chevron-right text-grey"></i></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-help" class="view page-bg">
+            <div class="page-header"><button class="circle-btn" onclick="App.navigateTo('view-map')"><i class="fas fa-arrow-left"></i></button><h2>Ajuda</h2><div style="width: 45px;"></div></div>
+            <div class="scroll-content">
+                <h3 class="section-label">Perguntas Frequentes</h3>
+                <div class="list-group">
+                    <div class="list-item" onclick="App.toggleFAQ(this)"><div class="text">Como funciona o QueueCut?</div><i class="fas fa-chevron-down text-grey"></i></div>
+                    <div class="faq-answer">O QueueCut conecta-te a "Waiters" que guardam o teu lugar na fila. Tu pagas pelo tempo e chegas só quando for a tua vez.</div>
+                    
+                    <div class="list-item" onclick="App.toggleFAQ(this)"><div class="text">É seguro pagar na app?</div><i class="fas fa-chevron-down text-grey"></i></div>
+                    <div class="faq-answer">Sim! Usamos processadores seguros como Stripe e Apple Pay. O dinheiro só é libertado quando o Waiter confirma o serviço.</div>
+                    
+                    <div class="list-item" onclick="App.toggleFAQ(this)"><div class="text">Como me torno um Waiter?</div><i class="fas fa-chevron-down text-grey"></i></div>
+                    <div class="faq-answer">Na tela de login, seleciona "Sou um Waiter" para te registares. Precisas de submeter a tua identificação para validação.</div>
+                </div>
+            </div>
+        </section>
+
+        <div id="modal-payment" class="modal-overlay">
+            <div class="modal-box">
+                <h3>Novo Cartão</h3>
+                <div class="input-group">
+                    <input type="text" id="card-num" placeholder=" " required>
+                    <label for="card-num">Número do Cartão</label>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group">
+                        <input type="text" id="card-exp" placeholder=" " required>
+                        <label for="card-exp">MM/AA</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="card-cvc" placeholder=" " required>
+                        <label for="card-cvc">CVC</label>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" style="color: #333; border-color: #ddd;" onclick="App.closeModal()">Cancelar</button>
+                    <button class="btn btn-primary" onclick="App.savePayment()">Adicionar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-receipt" class="modal-overlay">
+            <div class="modal-box" style="text-align: left;">
+                <h3 style="text-align: center;">Recibo #10234</h3>
+                <div style="margin: 15px 0; border-bottom: 1px dashed #ccc; padding-bottom: 15px;">
+                    <p><strong>Serviço:</strong> Mosteiro Jerónimos</p>
+                    <p><strong>Waiter:</strong> João Dinis</p>
+                    <p><strong>Tempo:</strong> 1h 45min</p>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem;">
+                    <span>Total</span>
+                    <span>12.50€</span>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-action" onclick="App.closeModal()">Fechar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="js/app.js"></script>
+    <div id="toast-container"></div>
+</body>
+</html>
