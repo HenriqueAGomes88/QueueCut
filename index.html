@@ -18,7 +18,7 @@
         <aside id="app-sidebar">
             <div class="sidebar-header" onclick="App.navigateTo('view-profile')">
                 <div class="user-brief">
-                    <img src="https://i.pravatar.cc/100?img=33" alt="User">
+                    <img src="assets/image_0.png" alt="User" style="object-fit: cover;">
                     <div>
                         <h3>Henrique Gomes</h3>
                         <span id="user-role-label">Modo Cliente</span>
@@ -33,7 +33,7 @@
                 <div class="menu-item" onclick="App.navigateTo('view-settings')"><i class="fas fa-cog"></i> Definições</div>
                 <div class="menu-item" onclick="App.navigateTo('view-help')"><i class="fas fa-question-circle"></i> Ajuda</div>
                 <div class="divider"></div>
-                <div class="menu-item" onclick="App.switchMode()"><i class="fas fa-exchange-alt"></i> <span id="switch-mode-text">Mudar para Waiter</span></div>
+                <div class="menu-item" onclick="App.switchMode()"><i class="fas fa-exchange-alt"></i> <span id="switch-mode-text">Mudar para Queuer</span></div>
                 <div class="menu-item logout" onclick="App.logout()"><i class="fas fa-sign-out-alt"></i> Sair</div>
             </nav>
         </aside>
@@ -47,14 +47,19 @@
                 </div>
                 <div class="login-actions">
                     <button class="btn btn-primary" onclick="App.login('client')">Entrar como Cliente</button>
-                    <button class="btn btn-outline" onclick="App.login('waiter')">Sou um Waiter</button>
+                    <button class="btn btn-outline" onclick="App.login('queuer')">Sou um Queuer</button>
                 </div>
             </div>
         </section>
 
         <section id="view-map" class="view">
             <div class="floating-ui top-left"><button class="circle-btn" onclick="App.toggleSidebar(true)"><i class="fas fa-bars"></i></button></div>
-            <div class="floating-ui top-right"><div class="profile-chip" onclick="App.navigateTo('view-profile')"><span>5.0 ★</span><img src="https://i.pravatar.cc/100?img=33" style="width: 32px; border-radius: 50%;"></div></div>
+            <div class="floating-ui top-right">
+                <div class="profile-chip" onclick="App.navigateTo('view-profile')">
+                    <span>5.0 ★</span>
+                    <img src="assets/image_0.png" style="width: 32px; border-radius: 50%; object-fit: cover;">
+                </div>
+            </div>
             
             <div id="map-container"></div>
             
@@ -67,40 +72,48 @@
                 <div id="panel-request" class="panel-state">
                     <div class="drag-handle" onclick="App.resetPanel()"></div>
                     <div class="location-header"><h2 id="selected-location-name">Local</h2><span class="badge-time">~2h espera</span></div>
-                    <div class="service-option selected"><div class="icon-box"><i class="fas fa-stopwatch" style="color: var(--primary-orange)"></i></div><div class="service-details"><span class="service-name">Lugar na Fila</span><span class="service-desc">Waiter chega em 5 min</span></div><div class="service-price">12.50€</div></div>
-                    <button class="btn btn-action" onclick="App.startMatching()">Confirmar Waiter</button>
+                    <div class="service-option selected"><div class="icon-box"><i class="fas fa-stopwatch" style="color: var(--primary-orange)"></i></div><div class="service-details"><span class="service-name">Lugar na Fila</span><span class="service-desc">Queuer chega em 5 min</span></div><div class="service-price">12.50€</div></div>
+                    <button class="btn btn-action" onclick="App.startMatching()">Confirmar Queuer</button>
                 </div>
-                <div id="panel-matching" class="panel-state"><div class="loader-container"><div class="pulse-ring"></div><i class="fas fa-user avatar-searching"></i></div><h3>A contactar Waiters...</h3></div>
+                <div id="panel-matching" class="panel-state"><div class="loader-container"><div class="pulse-ring"></div><i class="fas fa-user avatar-searching"></i></div><h3>A contactar Queuers...</h3></div>
                 <div id="panel-found" class="panel-state">
                     <div class="success-header"><i class="fas fa-check-circle"></i> Pedido Aceite!</div>
-                    <div class="waiter-card"><div style="width: 50px; height: 50px; background: #ddd; border-radius: 50%; overflow: hidden; margin-right: 12px;"><img src="https://i.pravatar.cc/150?u=waiter" width="50"></div><div class="waiter-info"><h3>João Dinis</h3><p>★ 4.9 • PG61142</p></div></div>
+                    <div class="queuer-card">
+                        <div style="width: 50px; height: 50px; background: #ddd; border-radius: 50%; overflow: hidden; margin-right: 12px;">
+                            <img src="assets/queuer.png" width="50" style="object-fit: cover;">
+                        </div>
+                        <div class="queuer-info"><h3>João Dinis</h3><p>★ 4.9 • PG61142</p></div>
+                    </div>
                     <button class="btn btn-outline" onclick="App.resetPanel()">Cancelar</button>
                 </div>
             </div>
         </section>
 
-        <section id="view-waiter-home" class="view">
-            <div class="waiter-top-bar">
+        <section id="view-queuer-home" class="view">
+            <div class="queuer-top-bar">
                 <button class="circle-btn" onclick="App.toggleSidebar(true)"><i class="fas fa-bars"></i></button>
                 <div class="earnings-pill">124.50€</div>
-                <div class="profile-chip waiter-chip"><span>4.9 ★</span><img src="https://i.pravatar.cc/100?img=12"></div>
+                <div class="profile-chip queuer-chip">
+                    <span>4.9 ★</span>
+                    <img src="assets/queuer.png" style="object-fit: cover;">
+                </div>
             </div>
 
-            <div id="map-container-waiter" style="flex-grow: 1; background: #e5e3df;"></div>
+            <div id="map-container-queuer" style="flex-grow: 1; background: #e5e3df;"></div>
 
-            <div id="go-online-btn" class="go-online-wrapper" onclick="WaiterApp.toggleOnline()">
+            <div id="go-online-btn" class="go-online-wrapper" onclick="QueuerApp.toggleOnline()">
                 <div class="go-button">GO</div>
                 <div class="go-status">OFFLINE</div>
             </div>
 
-            <div class="bottom-sheet" id="bottom-sheet-waiter">
+            <div class="bottom-sheet" id="bottom-sheet-queuer">
                 <div id="panel-job-offer" class="panel-state">
                     <div class="job-offer-header"><div class="time-dist">5 min • 2.1 km</div><div class="job-price">12.50€</div></div>
                     <h2 class="job-title">Mosteiro dos Jerónimos</h2>
                     <p class="job-desc">Fila estimada: 1h 45min</p>
                     <div class="job-actions">
-                        <button class="btn btn-outline reject" onclick="WaiterApp.rejectJob()">Recusar</button>
-                        <button class="btn btn-primary accept" onclick="WaiterApp.acceptJob()">Aceitar</button>
+                        <button class="btn btn-outline reject" onclick="QueuerApp.rejectJob()">Recusar</button>
+                        <button class="btn btn-primary accept" onclick="QueuerApp.acceptJob()">Aceitar</button>
                     </div>
                 </div>
                 <div id="panel-job-active" class="panel-state">
@@ -114,7 +127,7 @@
                         </div>
                     </div>
                     <div id="job-status-text" class="status-big">A caminho do local</div>
-                    <button id="job-action-btn" class="btn btn-action" onclick="WaiterApp.nextStep()">Cheguei ao Local</button>
+                    <button id="job-action-btn" class="btn btn-action" onclick="QueuerApp.nextStep()">Cheguei ao Local</button>
                 </div>
             </div>
         </section>
@@ -122,7 +135,10 @@
         <section id="view-profile" class="view page-bg">
             <div class="page-header"><button class="circle-btn" onclick="App.navigateTo('view-map')"><i class="fas fa-arrow-left"></i></button><h2>Perfil</h2><div style="width: 45px;"></div></div>
             <div class="scroll-content">
-                <div class="profile-avatar-large"><img src="https://i.pravatar.cc/100?img=33"><div class="edit-badge" onclick="App.editProfile()"><i class="fas fa-pen"></i></div></div>
+                <div class="profile-avatar-large">
+                    <img src="assets/image_0.png" style="object-fit: cover;">
+                    <div class="edit-badge" onclick="App.editProfile()"><i class="fas fa-pen"></i></div>
+                </div>
                 <h2 class="center-text mt-15">Henrique Gomes</h2><p class="center-text text-grey">PG60101</p>
                 <div class="list-group mt-15">
                     <div class="list-item" onclick="App.editProfile()"><i class="fas fa-user-edit icon"></i><div class="text">Editar Dados Pessoais</div></div>
@@ -148,7 +164,7 @@
             <div class="scroll-content">
                 <div class="history-card">
                     <div class="h-header"><span>04 Dez</span><span>12.50€</span></div>
-                    <div class="h-body"><h3>Mosteiro dos Jerónimos</h3><p>Waiter: João Dinis</p></div>
+                    <div class="h-body"><h3>Mosteiro Jerónimos</h3><p>Queuer: João Dinis</p></div>
                     <div class="h-footer"><span class="status-badge success">Concluído</span><button class="btn-text" onclick="App.openModal('modal-receipt')">Ver Recibo</button></div>
                 </div>
             </div>
@@ -189,13 +205,13 @@
                 <h3 class="section-label">Perguntas Frequentes</h3>
                 <div class="list-group">
                     <div class="list-item" onclick="App.toggleFAQ(this)"><div class="text">Como funciona o QueueCut?</div><i class="fas fa-chevron-down text-grey"></i></div>
-                    <div class="faq-answer">O QueueCut conecta-te a "Waiters" que guardam o teu lugar na fila. Tu pagas pelo tempo e chegas só quando for a tua vez.</div>
+                    <div class="faq-answer">O QueueCut conecta-te a "Queuers" que guardam o teu lugar na fila. Tu pagas pelo tempo e chegas só quando for a tua vez.</div>
                     
                     <div class="list-item" onclick="App.toggleFAQ(this)"><div class="text">É seguro pagar na app?</div><i class="fas fa-chevron-down text-grey"></i></div>
-                    <div class="faq-answer">Sim! Usamos processadores seguros como Stripe e Apple Pay. O dinheiro só é libertado quando o Waiter confirma o serviço.</div>
+                    <div class="faq-answer">Sim! Usamos processadores seguros como Stripe e Apple Pay. O dinheiro só é libertado quando o Queuer confirma o serviço.</div>
                     
-                    <div class="list-item" onclick="App.toggleFAQ(this)"><div class="text">Como me torno um Waiter?</div><i class="fas fa-chevron-down text-grey"></i></div>
-                    <div class="faq-answer">Na tela de login, seleciona "Sou um Waiter" para te registares. Precisas de submeter a tua identificação para validação.</div>
+                    <div class="list-item" onclick="App.toggleFAQ(this)"><div class="text">Como me torno um Queuer?</div><i class="fas fa-chevron-down text-grey"></i></div>
+                    <div class="faq-answer">Na tela de login, seleciona "Sou um Queuer" para te registares. Precisas de submeter a tua identificação para validação.</div>
                 </div>
             </div>
         </section>
@@ -229,7 +245,7 @@
                 <h3 style="text-align: center;">Recibo #10234</h3>
                 <div style="margin: 15px 0; border-bottom: 1px dashed #ccc; padding-bottom: 15px;">
                     <p><strong>Serviço:</strong> Mosteiro Jerónimos</p>
-                    <p><strong>Waiter:</strong> João Dinis</p>
+                    <p><strong>Queuer:</strong> João Dinis</p>
                     <p><strong>Tempo:</strong> 1h 45min</p>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem;">

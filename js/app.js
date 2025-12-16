@@ -1,7 +1,7 @@
-/* * QUEUECUT APP - Lógica Completa v4 */
+/* * QUEUECUT APP - Lógica Completa v5 */
 
 let map = null;
-let waiterMap = null;
+let queuerMap = null; // Mudança de nome da variável
 let routeLine = null;
 let currentUserMode = 'client'; 
 
@@ -12,16 +12,16 @@ const App = {
         if (role === 'client') {
             App.navigateTo('view-map');
             document.getElementById('user-role-label').innerText = 'Modo Cliente';
-            document.getElementById('switch-mode-text').innerText = 'Mudar para Waiter';
+            document.getElementById('switch-mode-text').innerText = 'Mudar para Queuer';
         } else {
-            App.navigateTo('view-waiter-home');
-            document.getElementById('user-role-label').innerText = 'Modo Waiter';
+            App.navigateTo('view-queuer-home'); // ID atualizado
+            document.getElementById('user-role-label').innerText = 'Modo Queuer';
             document.getElementById('switch-mode-text').innerText = 'Mudar para Cliente';
         }
     },
 
     switchMode: () => {
-        if (currentUserMode === 'client') App.login('waiter');
+        if (currentUserMode === 'client') App.login('queuer');
         else App.login('client');
     },
 
@@ -31,7 +31,7 @@ const App = {
         document.getElementById(viewId).classList.add('active');
 
         if (viewId === 'view-map') setTimeout(() => { App.initMap(); }, 100);
-        if (viewId === 'view-waiter-home') setTimeout(() => { WaiterApp.initWaiterMap(); }, 100);
+        if (viewId === 'view-queuer-home') setTimeout(() => { QueuerApp.initQueuerMap(); }, 100);
     },
 
     toggleSidebar: (show) => {
@@ -52,11 +52,12 @@ const App = {
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(map);
         
         const userIcon = L.divIcon({ className: 'custom-pin', html: '<div class="user-pin" style="color:#003B70; font-size:32px;"><i class="fas fa-map-marker-alt"></i></div>', iconSize: [40, 40], iconAnchor: [20, 40] });
-        const waiterIcon = L.divIcon({ className: 'custom-pin', html: '<div class="waiter-pin" style="color:#FF8A00; background:white; border-radius:50%; width:30px; height:30px; display:flex; justify-content:center; align-items:center; box-shadow:0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-person"></i></div>', iconSize: [30, 30], iconAnchor: [15, 15] });
+        // Alterado waiter-pin para queuer-pin na classe
+        const queuerIcon = L.divIcon({ className: 'custom-pin', html: '<div class="queuer-pin" style="color:#FF8A00; background:white; border-radius:50%; width:30px; height:30px; display:flex; justify-content:center; align-items:center; box-shadow:0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-person"></i></div>', iconSize: [30, 30], iconAnchor: [15, 15] });
 
         L.marker([38.697056, -9.206637], {icon: userIcon}).addTo(map); 
-        L.marker([38.6975, -9.2070], {icon: waiterIcon}).addTo(map); 
-        L.marker([38.6965, -9.2060], {icon: waiterIcon}).addTo(map); 
+        L.marker([38.6975, -9.2070], {icon: queuerIcon}).addTo(map); 
+        L.marker([38.6965, -9.2060], {icon: queuerIcon}).addTo(map); 
     },
 
     openRequest: (locationName) => {
@@ -64,17 +65,17 @@ const App = {
         App.switchPanelState('bottom-sheet-client', 'panel-request');
         if (map && locationName.includes('Jerónimos')) {
             const dest = [38.697056, -9.206637];
-            const waiter = [38.6975, -9.2070];
+            const queuer = [38.6975, -9.2070];
             map.flyTo(dest, 17);
             if (routeLine) map.removeLayer(routeLine);
-            routeLine = L.polyline([dest, waiter], {color:'#003B70', weight:4, dashArray:'10,10'}).addTo(map);
+            routeLine = L.polyline([dest, queuer], {color:'#003B70', weight:4, dashArray:'10,10'}).addTo(map);
             map.fitBounds(routeLine.getBounds(), {padding:[50,50]});
         }
     },
 
     startMatching: () => {
         App.switchPanelState('bottom-sheet-client', 'panel-matching');
-        setTimeout(() => { App.switchPanelState('bottom-sheet-client', 'panel-found'); App.showToast("Waiter encontrado!", "success"); }, 3000);
+        setTimeout(() => { App.switchPanelState('bottom-sheet-client', 'panel-found'); App.showToast("Queuer encontrado!", "success"); }, 3000);
     },
 
     resetPanel: () => {
@@ -115,60 +116,60 @@ const App = {
     toggleFAQ: (el) => { el.classList.toggle('open'); }
 };
 
-// --- APP WAITER ---
-const WaiterApp = {
+// --- APP QUEUER (Anteriormente WaiterApp) ---
+const QueuerApp = {
     isOnline: false,
     jobStep: 0,
     jobSteps: ["Cheguei ao Local", "Estou na Fila", "Tenho a Senha", "Cliente Chegou", "Concluir"],
 
-    initWaiterMap: () => {
-        if (waiterMap) { waiterMap.invalidateSize(); return; }
-        waiterMap = L.map('map-container-waiter', { zoomControl: false }).setView([38.697056, -9.206637], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(waiterMap);
-        L.marker([38.697056, -9.206637], {icon: L.divIcon({html: '<i class="fas fa-location-arrow" style="font-size:24px; color:#003B70; transform: rotate(-45deg);"></i>', className:'my-pos'})}).addTo(waiterMap);
+    initQueuerMap: () => {
+        if (queuerMap) { queuerMap.invalidateSize(); return; }
+        queuerMap = L.map('map-container-queuer', { zoomControl: false }).setView([38.697056, -9.206637], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(queuerMap);
+        L.marker([38.697056, -9.206637], {icon: L.divIcon({html: '<i class="fas fa-location-arrow" style="font-size:24px; color:#003B70; transform: rotate(-45deg);"></i>', className:'my-pos'})}).addTo(queuerMap);
     },
 
     toggleOnline: () => {
         const btn = document.getElementById('go-online-btn');
-        WaiterApp.isOnline = !WaiterApp.isOnline;
-        if (WaiterApp.isOnline) {
+        QueuerApp.isOnline = !QueuerApp.isOnline;
+        if (QueuerApp.isOnline) {
             btn.classList.add('online');
             btn.querySelector('.go-button').innerText = "STOP";
             btn.querySelector('.go-status').innerText = "ONLINE";
             App.showToast("Estás Online!", "success");
-            setTimeout(() => { App.switchPanelState('bottom-sheet-waiter', 'panel-job-offer'); }, 3000);
+            setTimeout(() => { App.switchPanelState('bottom-sheet-queuer', 'panel-job-offer'); }, 3000);
         } else {
             btn.classList.remove('online');
             btn.querySelector('.go-button').innerText = "GO";
             btn.querySelector('.go-status').innerText = "OFFLINE";
-            App.switchPanelState('bottom-sheet-waiter', 'panel-hidden');
+            App.switchPanelState('bottom-sheet-queuer', 'panel-hidden');
         }
     },
 
     acceptJob: () => {
-        App.switchPanelState('bottom-sheet-waiter', 'panel-job-active');
+        App.switchPanelState('bottom-sheet-queuer', 'panel-job-active');
         document.getElementById('go-online-btn').style.display = 'none';
-        WaiterApp.jobStep = 0;
-        WaiterApp.updateJobUI();
+        QueuerApp.jobStep = 0;
+        QueuerApp.updateJobUI();
     },
 
-    rejectJob: () => { App.switchPanelState('bottom-sheet-waiter', 'panel-hidden'); App.showToast("Recusado", "error"); },
+    rejectJob: () => { App.switchPanelState('bottom-sheet-queuer', 'panel-hidden'); App.showToast("Recusado", "error"); },
 
     nextStep: () => {
-        WaiterApp.jobStep++;
-        if (WaiterApp.jobStep >= WaiterApp.jobSteps.length) {
+        QueuerApp.jobStep++;
+        if (QueuerApp.jobStep >= QueuerApp.jobSteps.length) {
             App.showToast("Trabalho concluído! +12.50€", "success");
             document.getElementById('go-online-btn').style.display = 'block';
-            App.switchPanelState('bottom-sheet-waiter', 'panel-hidden');
+            App.switchPanelState('bottom-sheet-queuer', 'panel-hidden');
             return;
         }
-        WaiterApp.updateJobUI();
+        QueuerApp.updateJobUI();
     },
 
     updateJobUI: () => {
-        document.getElementById('job-action-btn').innerText = WaiterApp.jobSteps[WaiterApp.jobStep];
+        document.getElementById('job-action-btn').innerText = QueuerApp.jobSteps[QueuerApp.jobStep];
         const statuses = ["A ir para o local...", "À espera na fila...", "Na fila (com senha)...", "À espera do cliente...", "A finalizar..."];
-        document.getElementById('job-status-text').innerText = statuses[WaiterApp.jobStep];
-        document.querySelectorAll('.step-dot').forEach((d,i) => i <= WaiterApp.jobStep ? d.classList.add('active') : d.classList.remove('active'));
+        document.getElementById('job-status-text').innerText = statuses[QueuerApp.jobStep];
+        document.querySelectorAll('.step-dot').forEach((d,i) => i <= QueuerApp.jobStep ? d.classList.add('active') : d.classList.remove('active'));
     }
 };
